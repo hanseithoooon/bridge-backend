@@ -8,10 +8,12 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import SMSSender from '../utils/sms-sender';
 import { ConfigService } from '@nestjs/config';
+import { VarifyCodeDto } from './dto/varify-code.dto'
   
 @Injectable()
 export class AuthService {
   private users = [];
+  private sentCodes = {};
   private smsSender: SMSSender;
   
   constructor(
@@ -46,6 +48,9 @@ export class AuthService {
   
   async register(registerDto: RegisterDto): Promise<any> {
     const { username, password, phoneNumber } = registerDto;
+    const code = this.generateVerificationCode();
+    await this.smsSender.sendSMS(phoneNumber, process.env.SMS_FROM, code)
+    this.sentCodes[phoneNumber] = code;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       id: this.users.length + 1,
@@ -55,10 +60,27 @@ export class AuthService {
     };
     this.users.push(newUser);
 
-    await this.smsSender.sendSMS(phoneNumber, process.env.SMS_FROM, 'SMS_SUCCES');
-
     return {
       message: 'SUCCESS',
     };
+  }
+
+  async verifyCode(verifyCodeDto: VarifyCodeDto): Promise<any> {
+    const { phoneNumber, code } = verifyCodeDto;
+    const sentCode = this.sentCodes[phoneNumber];
+    if (sentCode === code){
+      return {
+        message: 'CODE_CORRECT'
+      }
+    }
+    else {
+      return {
+        message: 'CODE_NOT_CORRECT'
+      }
+    }
+  }
+
+  private generateVerificationCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 }
