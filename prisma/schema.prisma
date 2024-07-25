@@ -51,6 +51,10 @@ model Post {
   categoryId  Int
   // 카테고리 정보
   category    Category  @relation(fields: [categoryId], references: [id])
+  // 생성된 시간
+  createdAt    DateTime  @default(now())
+  // 수정된 시간 (만약 수정되지 않았을 시엔 Null)
+  updatedAt    DateTime? @updatedAt
   // 댓글
   comments    Comment[]
   // 스크랩 정보

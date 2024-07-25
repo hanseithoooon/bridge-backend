@@ -7,6 +7,7 @@ import { ArticleModule } from './post/post.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
+import { JwtStrategy } from './auth/strategy/jwt/jwt.strategy';
 
 @Module({
   imports: [
