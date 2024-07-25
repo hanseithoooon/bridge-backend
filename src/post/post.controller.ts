@@ -23,13 +23,12 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
-  async getAllPosts(@Query() data: GetAllPostRequest) {
+  async getAllPosts(@Query('categoryId', ParseIntPipe) categoryId: number) {
     // const userId = req.user?.id;
     // if (!userId) {
     //   throw new UnauthorizedException();
     // }
-    const dummyUID = 1;
-    return this.postService.getAllPosts(data);
+    return this.postService.getAllPosts(categoryId);
   }
 
   @Get(':postId')
@@ -65,5 +64,25 @@ export class PostController {
     // }
     const userId = 1;
     return this.postService.updatePost(postId, updatePostDto, userId);
+  }
+
+  @Post('/delete/:postId')
+  async deletePost(@Param('postId', ParseIntPipe) postId: number) {
+    // const userId = req.user?.id;
+    // if (!userId) {
+    //   throw new UnauthorizedException();
+    // }
+    const userId = 1;
+    return this.postService.deletePost(postId, userId);
+  }
+
+  @Post('/like/:postId')
+  async likePost(@Param('postId', ParseIntPipe) postId: number) {
+    // const userId = req.user?.id;
+    // if (!userId) {
+    //   throw new UnauthorizedException();
+    // }
+    const userId = 1;
+    return this.postService.likePost(postId, userId);
   }
 }

@@ -53,11 +53,6 @@ export class GetAllPostRequest {
   @IsNotEmpty()
   @IsNumber()
   categoryId: number;
-
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
-  cursor: number;
 }
 
 export class UpdatePostRequest {

@@ -17,20 +17,18 @@ import {
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  public async getAllPosts(data: GetAllPostRequest) {
-    const { categoryId, cursor } = data;
-    // if (!categoryId || !cursor) {
-    //   throw new InternalServerErrorException('categoryId is required');
-    // }
+  public async getAllPosts(categoryId: number) {
+    if (!categoryId) {
+      throw new BadRequestException('categoryId is required');
+    }
     const limit = 10;
+    const numCategoryId = Number(categoryId);
 
     const posts = await this.prisma.post.findMany({
       where: {
-        categoryId: categoryId ?? undefined,
+        categoryId: numCategoryId ?? undefined,
       },
-      cursor: cursor ? { id: cursor } : undefined,
       take: limit,
-      skip: cursor ? 1 : 0,
       orderBy: {
         id: 'asc',
       },
@@ -40,7 +38,7 @@ export class PostService {
         isAnonymous: true,
         like: true,
         createdAt: true,
-        authorId: true, // Ensure authorId is selected for conversion
+        authorId: true,
       },
     });
 
@@ -48,7 +46,6 @@ export class PostService {
       throw new InternalServerErrorException('Failed to retrieve posts');
     }
 
-    // Convert BigInt fields to strings
     const serializedPosts = posts.map((post) => ({
       ...post,
       id: post.id.toString(),
@@ -61,7 +58,7 @@ export class PostService {
   public async getPostById(postId: number) {
     const post = await this.prisma.post.findUnique({
       where: {
-        id: postId,
+        id: Number(postId),
       },
       select: {
         title: true,
@@ -80,7 +77,7 @@ export class PostService {
 
     const user = await this.prisma.user.findUnique({
       where: {
-        id: post.authorId,
+        id: Number(post.authorId),
       },
       select: {
         nickname: true,
@@ -163,6 +160,57 @@ export class PostService {
       message: 'SUCCESS',
       postId: Number(post.id),
       like: post.like,
+    };
+  }
+
+  public async deletePost(postId: number, userId: number) {
+    const existingPost = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!existingPost) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    if (existingPost.authorId !== userId) {
+      throw new UnauthorizedException(
+        'You do not have permission to delete this post',
+      );
+    }
+
+    await this.prisma.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+
+    return {
+      message: 'SUCCESS',
+    };
+  }
+
+  public async likePost(postId: number, userId: number) {
+    const existingPost = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!existingPost) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    const updatedPost = await this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        like: {
+          increment: 1,
+        },
+      },
+    });
+
+    return {
+      message: 'SUCCESS',
+      postId: updatedPost.id,
+      like: updatedPost.like,
     };
   }
 }
