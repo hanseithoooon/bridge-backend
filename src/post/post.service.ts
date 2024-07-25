@@ -1,10 +1,16 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   CreatePostRequest,
   CreatePostResponse,
   GetAllPostRequest,
-  GetPostByIdRequest,
+  UpdatePostRequest,
 } from './dto/post.dto';
 
 @Injectable()
@@ -55,7 +61,7 @@ export class PostService {
   public async getPostById(postId: number) {
     const post = await this.prisma.post.findUnique({
       where: {
-        id: BigInt(postId),
+        id: postId,
       },
       select: {
         title: true,
@@ -67,6 +73,10 @@ export class PostService {
         authorId: true,
       },
     });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
 
     const user = await this.prisma.user.findUnique({
       where: {
@@ -113,6 +123,48 @@ export class PostService {
       message: 'SUCCESS',
       postId: Number(post.id),
       isAnonymous: post.isAnonymous,
+    };
+  }
+
+  public async updatePost(
+    postId: number,
+    data: UpdatePostRequest,
+    userId: number,
+  ) {
+    const { title, content } = data;
+
+    if (!title && !content) {
+      throw new BadRequestException('At least one field is required');
+    }
+
+    const existingPost = await this.prisma.post.findUnique({
+      where: { id: BigInt(postId) },
+    });
+
+    if (!existingPost) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    if (existingPost.authorId !== BigInt(userId)) {
+      throw new UnauthorizedException(
+        'You do not have permission to update this post',
+      );
+    }
+
+    const post = await this.prisma.post.update({
+      where: {
+        id: BigInt(postId),
+      },
+      data: {
+        title,
+        content,
+      },
+    });
+
+    return {
+      message: 'SUCCESS',
+      postId: Number(post.id),
+      like: post.like,
     };
   }
 }

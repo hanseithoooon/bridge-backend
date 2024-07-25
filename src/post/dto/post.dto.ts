@@ -60,9 +60,12 @@ export class GetAllPostRequest {
   cursor: number;
 }
 
-export class GetPostByIdRequest {
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
-  postId: number;
+export class UpdatePostRequest {
+  @ApiProperty({ example: 'My First Post' })
+  @IsString()
+  title?: string;
+
+  @ApiProperty({ example: 'This is the content of my first post.' })
+  @IsString()
+  content?: string;
 }
