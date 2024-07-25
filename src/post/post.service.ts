@@ -107,13 +107,11 @@ export class PostService {
   ): Promise<CreatePostResponse> {
     const { title, content, categoryId, isAnonymous } = data;
 
-    const bigIntUserId = BigInt(userId);
-
     const post = await this.prisma.post.create({
       data: {
         title,
         content,
-        authorId: bigIntUserId,
+        authorId: userId,
         categoryId,
         isAnonymous,
       },
@@ -138,14 +136,14 @@ export class PostService {
     }
 
     const existingPost = await this.prisma.post.findUnique({
-      where: { id: BigInt(postId) },
+      where: { id: postId },
     });
 
     if (!existingPost) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
-    if (existingPost.authorId !== BigInt(userId)) {
+    if (existingPost.authorId !== userId) {
       throw new UnauthorizedException(
         'You do not have permission to update this post',
       );
@@ -153,7 +151,7 @@ export class PostService {
 
     const post = await this.prisma.post.update({
       where: {
-        id: BigInt(postId),
+        id: postId,
       },
       data: {
         title,
