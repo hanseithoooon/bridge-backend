@@ -28,14 +28,14 @@ export class PostController {
   }
 
   @Get(':postId')
-  async getPostById(@Param() data: GetAllPostRequest) {
+  async getPostById(@Param('postId') postId: number) {
     // const userId = req.user?.id;
     // if (!userId) {
     //   throw new UnauthorizedException();
     // }
-    const { postId } = data;
+    // const { postId } = data;
     const dummyUID = 1;
-    return this.postService.getAllPosts(postId);
+    return this.postService.getPostById(postId);
   }
 
   @Post('/create')

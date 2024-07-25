@@ -52,8 +52,7 @@ export class PostService {
     return serializedPosts;
   }
 
-  public async getPostById(data: GetPostByIdRequest) {
-    const { postId } = data;
+  public async getPostById(postId: number) {
     const post = await this.prisma.post.findUnique({
       where: {
         id: BigInt(postId),
