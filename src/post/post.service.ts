@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   CreatePostRequest,
   CreatePostResponse,
   GetAllPostRequest,
+  GetPostByIdRequest,
 } from './dto/post.dto';
 
 @Injectable()
@@ -12,6 +13,9 @@ export class PostService {
 
   public async getAllPosts(data: GetAllPostRequest) {
     const { categoryId, cursor } = data;
+    // if (!categoryId || !cursor) {
+    //   throw new InternalServerErrorException('categoryId is required');
+    // }
     const limit = 10;
 
     const posts = await this.prisma.post.findMany({
@@ -30,10 +34,62 @@ export class PostService {
         isAnonymous: true,
         like: true,
         createdAt: true,
+        authorId: true, // Ensure authorId is selected for conversion
       },
     });
 
-    return posts;
+    if (!posts) {
+      throw new InternalServerErrorException('Failed to retrieve posts');
+    }
+
+    // Convert BigInt fields to strings
+    const serializedPosts = posts.map((post) => ({
+      ...post,
+      id: post.id.toString(),
+      authorId: post.authorId.toString(),
+    }));
+
+    return serializedPosts;
+  }
+
+  public async getPostById(data: GetPostByIdRequest) {
+    const { postId } = data;
+    const post = await this.prisma.post.findUnique({
+      where: {
+        id: BigInt(postId),
+      },
+      select: {
+        title: true,
+        content: true,
+        isAnonymous: true,
+        like: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
+      },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: post.authorId,
+      },
+      select: {
+        nickname: true,
+      },
+    });
+
+    return {
+      message: 'SUCCESS',
+      data: {
+        title: post.title,
+        content: post.content,
+        isAnonymous: post.isAnonymous,
+        like: post.like,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        user: user.nickname,
+      },
+    };
   }
 
   public async createPost(

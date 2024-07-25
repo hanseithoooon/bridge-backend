@@ -59,3 +59,10 @@ export class GetAllPostRequest {
   @IsNumber()
   cursor: number;
 }
+
+export class GetPostByIdRequest {
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  postId: number;
+}

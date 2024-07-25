@@ -8,6 +8,7 @@ import {
   UseGuards,
   UnauthorizedException,
   Body,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostRequest, GetAllPostRequest } from './dto/post.dto';
@@ -17,13 +18,24 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
-  async getAllPosts(@Param() data: GetAllPostRequest) {
+  async getAllPosts(@Query() data: GetAllPostRequest) {
     // const userId = req.user?.id;
     // if (!userId) {
     //   throw new UnauthorizedException();
     // }
     const dummyUID = 1;
     return this.postService.getAllPosts(data);
+  }
+
+  @Get(':postId')
+  async getPostById(@Param() data: GetAllPostRequest) {
+    // const userId = req.user?.id;
+    // if (!userId) {
+    //   throw new UnauthorizedException();
+    // }
+    const { postId } = data;
+    const dummyUID = 1;
+    return this.postService.getAllPosts(postId);
   }
 
   @Post('/create')
