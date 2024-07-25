@@ -51,6 +51,10 @@ model Post {
   category    Category  @relation(fields: [categoryId], references: [id])
   // 댓글
   comments    Comment[]
+  // 생성 일시
+  createdAt   DateTime  @default(now())
+  // 수정 일시 (만약 수정되지 않았다면 Null)
+  updatedAt   DateTime? @updatedAt
   // 스크랩 정보
   scraps      Scrap[]
 }
@@ -82,7 +86,7 @@ model Comment {
   // 생성 일시
   createdAt  DateTime @default(now())
   // 좋아요 개수
-  like       Int
+  like       Int   @default(0)
 }
 
 model Scrap {

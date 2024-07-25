@@ -47,3 +47,15 @@ export class CreatePostResponse {
   @IsBoolean()
   isAnonymous: boolean;
 }
+
+export class GetAllPostRequest {
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  categoryId: number;
+
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  cursor: number;
+}

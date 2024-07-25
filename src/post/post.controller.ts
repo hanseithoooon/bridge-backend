@@ -10,20 +10,20 @@ import {
   Body,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostRequest } from './dto/post.dto';
+import { CreatePostRequest, GetAllPostRequest } from './dto/post.dto';
 
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
-  async getAllPosts() {
+  async getAllPosts(@Param() data: GetAllPostRequest) {
     // const userId = req.user?.id;
     // if (!userId) {
     //   throw new UnauthorizedException();
     // }
     const dummyUID = 1;
-    return this.postService.getAllPosts();
+    return this.postService.getAllPosts(data);
   }
 
   @Post('/create')
