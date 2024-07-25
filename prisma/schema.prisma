@@ -15,13 +15,15 @@ model User {
   // 전화번호
   phone        String
   // 닉네임
-  nickname     String
+  nickname     String    @unique
   // 작성한 게시글
   posts        Post[]    @relation(name: "UserPosts")
   // 스크랩한 게시글
   scrapedPosts Scrap[]   @relation(name: "UserScrapedPosts")
   // 세대 (예: 10대, 20대)
   generation   String
+  //비밀번호 
+  password String
   // 생성된 시간
   createdAt    DateTime  @default(now())
   // 수정된 시간 (만약 수정되지 않았을 시엔 Null)
@@ -40,7 +42,7 @@ model Post {
   // 작성자 id
   authorId    Int
   // 좋아요 개수
-  like        Int       @default(0)
+  like        Int     @default(0)
   // 익명 여부
   isAnonymous Boolean
   // 작성자 정보
@@ -82,8 +84,8 @@ model Comment {
   // 생성 일시
   createdAt  DateTime @default(now())
   // 좋아요 개수
-  like       Int
-}
+  like       Int      @default(0)
+} 
 
 model Scrap {
   // 고유 id
