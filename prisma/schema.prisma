@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   // 고유 id
-  id           BigInt       @id @default(autoincrement())
+  id           BigInt    @id @default(autoincrement())
   // 실제 나이
   age          Int
   // 전화번호
@@ -25,22 +25,22 @@ model User {
   // 생성된 시간
   createdAt    DateTime  @default(now())
   // 수정된 시간 (만약 수정되지 않았을 시엔 Null)
-  updatedAt    DateTime?  @updatedAt
+  updatedAt    DateTime? @updatedAt
   // 작성한 댓글
   Comment      Comment[]
 }
 
 model Post {
   // 고유 id
-  id          BigInt       @id @default(autoincrement())
-  // 제목 d
-  title       String       @db.VarChar(255)
+  id          BigInt    @id @default(autoincrement())
+  // 제목 
+  title       String    @db.VarChar(255)
   // 게시글 내용
-  content     String       @db.VarChar(2000)
+  content     String    @db.VarChar(2000)
   // 작성자 id
   authorId    BigInt
   // 좋아요 개수
-  like        Int
+  like        Int       @default(0)
   // 익명 여부
   isAnonymous Boolean
   // 작성자 정보
@@ -66,7 +66,7 @@ model Category {
 
 model Comment {
   // 고유 id
-  id         BigInt      @id @default(autoincrement())
+  id         BigInt   @id @default(autoincrement())
   // 댓글 내용
   content    String
   // 게시글 id
@@ -87,7 +87,7 @@ model Comment {
 
 model Scrap {
   // 고유 id
-  id        BigInt      @id @default(autoincrement())
+  id        BigInt   @id @default(autoincrement())
   // 스크랩한 유저 id
   userId    BigInt
   // 스크랩한 게시글 id

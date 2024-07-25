@@ -23,8 +23,8 @@ export class PostService {
         title,
         content,
         authorId: bigIntUserId,
-        categoryId: categoryId,
-        isAnonymous: isAnonymous,
+        categoryId,
+        isAnonymous,
       },
     });
 
