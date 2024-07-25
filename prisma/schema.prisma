@@ -16,6 +16,8 @@ model User {
   phone        String
   // 닉네임
   nickname     String
+  // 비밀번호 
+  password     String
   // 작성한 게시글
   posts        Post[]    @relation(name: "UserPosts")
   // 스크랩한 게시글
