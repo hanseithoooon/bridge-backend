@@ -6,6 +6,7 @@ import { PostService } from './post/post.service';
 import { ArticleModule } from './post/post.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UserModule } from './user/user.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     UserModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    CommentModule,
   ],
   providers: [AppService, PostService],
 })
