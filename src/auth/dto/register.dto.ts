@@ -1,9 +1,8 @@
 import { IsString } from 'class-validator';
 
 export class RegisterDto {
-    username: string;
-    password: string;
-    phoneNumber: string;
-
-
+  username: string;
+  password: string;
+  phoneNumber: string;
+  age: number;
 }

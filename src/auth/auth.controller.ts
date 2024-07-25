@@ -1,15 +1,9 @@
-import { 
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  Request
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { JwtAuthGuard } from './strategy/jwt/jwt-auth.guard'
-import { VarifyCodeDto } from './dto/varify-code.dto'
+import { JwtAuthGuard } from './strategy/jwt/jwt-auth.guard';
+import { VarifyCodeDto } from './dto/varify-code.dto';
 
 @Controller('/auth')
 export class AuthController {
@@ -26,8 +20,8 @@ export class AuthController {
   }
 
   @Post('/verify-code')
-  async verifyCode(@Body() verifyCodeDto: VarifyCodeDto) {
-    return await this.authService.verifyCode(verifyCodeDto);
+  async verifyCode(@Body() verify: VarifyCodeDto) {
+    return await this.authService.verifyCode(verify);
   }
 
   @UseGuards(JwtAuthGuard)
