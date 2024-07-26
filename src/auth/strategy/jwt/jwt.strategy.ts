@@ -8,21 +8,20 @@ import { AuthService } from 'src/auth/auth.service';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService,
+    private readonly config: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: config.get<string>('JWT_SECRET'),
     });
   }
 
   async validate(payload: any): Promise<any> {
     const user = await this.authService.tokenValidateUser(payload);
-    console.log(user);
     if (!user) {
       throw new UnauthorizedException('User does not exist');
     }
-    return user;
+    return { id: user.id, username: user.username };
   }
 }

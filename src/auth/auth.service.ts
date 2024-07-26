@@ -29,21 +29,37 @@ export class AuthService {
     );
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = this.users.find((user) => user.username === username);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
+  async tokenValidateUser(payload: any): Promise<any> {
+    const { sub } = payload;
+    const user = await this.prisma.user.findUnique({
+      where: { id: sub },
+    });
+    return user;
   }
 
+  // async validate(payload: any): Promise<any> {
+  //   const user = await this.tokenValidateUser(payload);
+  //   console.log(user);
+  //   if (!user) {
+  //     throw new UnauthorizedException('User does not exist');
+  //   }
+  //   return user;
+  // }
+
   async login(loginDto: LoginDto): Promise<any> {
-    const user = await this.validateUser(loginDto.username, loginDto.password);
-    if (!user) {
+    const { username, password } = loginDto;
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        nickname: username,
+      },
+    });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException();
     }
-    const payload = { username: user.username, sub: user.id };
+
+    const payload = { username: user.nickname, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -54,15 +70,6 @@ export class AuthService {
     const code = this.generateVerificationCode();
     await this.smsSender.sendSMS(phoneNumber, process.env.SMS_FROM, code);
     this.sentCodes[phoneNumber] = code;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // const newUser = {
-    //   id: this.users.length + 1,
-    //   username,
-    //   password: hashedPassword,
-    //   phoneNumber,
-    // };
-    // this.users.push(newUser);
 
     return {
       message: 'SUCCESS',

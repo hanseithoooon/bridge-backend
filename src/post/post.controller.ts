@@ -2,7 +2,7 @@ import {
   Controller,
   Get,
   Param,
-  Req,
+  Request,
   Post,
   HttpException,
   UseGuards,
@@ -37,9 +37,12 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/create')
-  async createPost(@Body() data: CreatePostRequest, @Req() req): Promise<any> {
+  async createPost(
+    @Body() data: CreatePostRequest,
+    @Request() req,
+  ): Promise<any> {
     const userId = req.user?.id;
-    console.log(userId);
+
     if (!userId) {
       throw new UnauthorizedException();
     }
@@ -52,13 +55,12 @@ export class PostController {
   async updatePost(
     @Param('postId', ParseIntPipe) postId: number,
     @Body() updatePostDto: UpdatePostRequest,
-    @Req() req: any,
+    @Request() req: any,
   ) {
     const userId = req.user?.id;
     if (!userId) {
       throw new UnauthorizedException('Unauthorized access');
     }
-
     return this.postService.updatePost(postId, updatePostDto, userId);
   }
 
@@ -66,7 +68,7 @@ export class PostController {
   @Post('/delete/:postId')
   async deletePost(
     @Param('postId', ParseIntPipe) postId: number,
-    @Req() req: any,
+    @Request() req: any,
   ) {
     const userId = req.user?.id;
     if (!userId) {
@@ -80,7 +82,7 @@ export class PostController {
   @Post('/like/:postId')
   async likePost(
     @Param('postId', ParseIntPipe) postId: number,
-    @Req() req: any,
+    @Request() req: any,
   ) {
     const userId = req.user?.id;
     if (!userId) {

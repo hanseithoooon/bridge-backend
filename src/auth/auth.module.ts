@@ -11,15 +11,16 @@ import { PrismaService } from 'prisma/prisma.service';
   imports: [
     ConfigModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule], // ConfigService를 사용하기 위해 가져옴
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'), // JWT 비밀키 설정
-        signOptions: { expiresIn: '60s' }, // JWT 토큰 만료 시간 설정
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '3d' },
       }),
     }),
   ],
   providers: [AuthService, JwtStrategy, PrismaService],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}
